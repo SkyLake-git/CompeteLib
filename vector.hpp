@@ -50,25 +50,25 @@ struct vec2 {
         return vec2{this->x / another.x, this->y / another.y};
     }
 
-    vec2 &operator+=(const vec2 &another) const {
+    vec2 &operator+=(const vec2 &another) {
         this->x += another.x;
         this->y += another.y;
         return *this;
     }
 
-    vec2 &operator-=(const vec2 &another) const {
+    vec2 &operator-=(const vec2 &another) {
         this->x -= another.x;
         this->y -= another.y;
         return *this;
     }
 
-    vec2 &operator*=(const vec2 &another) const {
+    vec2 &operator*=(const vec2 &another) {
         this->x *= another.x;
         this->y *= another.y;
         return *this;
     }
 
-    vec2 &operator/=(const vec2 &another) const {
+    vec2 &operator/=(const vec2 &another) {
         this->x /= another.x;
         this->y /= another.y;
         return *this;
@@ -79,7 +79,7 @@ struct vec2 {
     }
 
     bool operator!=(const vec2 &another) const {
-        return !(this == another);
+        return !(*this == another);
     }
 };
 
@@ -91,10 +91,12 @@ struct vec2l : vec2<long long> {
 
 template<DistanceAlgo C, Arithmetic T, Arithmetic R>
 R calc_vec_distance(const vec2<T> &a, const vec2<T> &b) {
+    const R dx = static_cast<R>(a.x) - static_cast<R>(b.x);
+    const R dy = static_cast<R>(a.y) - static_cast<R>(b.y);
     if constexpr (C == Euclidean) {
-        return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+        return dx * dx + dy * dy;
     } else if constexpr (C == Manhattan) {
-        return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+        return (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
     } else {
         throw std::logic_error("");
     }
@@ -112,10 +114,11 @@ bool eval_vec_distance(const vec2<T> &a, const vec2<T> &b, R range) {
 /**
  * 指定範囲の二次元空間にある大量の点に対して、以下の操作を高速に行える構造体
  * - 指定位置から一定距離内の点を全て列挙
+ * - 指定位置から一定距離内で最も近い点を取得
  * - 指定位置から最も近い点を取得
  *
  * 点が広く分布している・範囲がそれなりに広い・点の数がそれなりに多い 場合に有効です。
- * それ以外の場合は、全探索の方が高速なことに注意してください。
+ * それ以外の場合は、全探索の方が高速な場合が多いことに注意してください。
  *
  * @tparam T @see {vec2}
  * @tparam X x の最大範囲 [-x, x)
@@ -126,40 +129,26 @@ template<Arithmetic T, unsigned short X, unsigned short Y, unsigned short BITS>
 struct bounded_plane {
 protected:
     unsigned int next_id = 0;
-
-    std::vector<unsigned int>
-    chunks[(((X - 1) >> BITS) + 1) * 2]
-    [(((Y - 1) >> BITS) + 1) * 2];
-
+    std::vector<unsigned int> chunks[(((X - 1) >> BITS) + 1) * 2][(((Y - 1) >> BITS) + 1) * 2];
     std::vector<vec2<T>> points;
-
     unsigned short X_CHUNK_HALF = (((X - 1) >> BITS) + 1);
     unsigned short Y_CHUNK_HALF = (((Y - 1) >> BITS) + 1);
 
 public:
     explicit bounded_plane() : chunks() {
-    }
+    };
 
     std::pair<unsigned int, unsigned int> get_chunk_count() const {
-        return {
-            X_CHUNK_HALF * 2,
-            Y_CHUNK_HALF * 2
-        };
+        return {X_CHUNK_HALF * 2, Y_CHUNK_HALF * 2};
     }
 
     unsigned int get_chunk_size() const {
         return 1 << BITS;
     }
 
-    std::pair<unsigned int, unsigned int>
-    get_chunk_indexes(const int &x, const int &y) const {
-        short fx = static_cast<short>(
-            std::clamp(x, -X, X + 1)
-        );
-
-        short fy = static_cast<short>(
-            std::clamp(y, -Y, Y + 1)
-        );
+    std::pair<unsigned int, unsigned int> get_chunk_indexes(const int &x, const int &y) const {
+        int fx = std::clamp(x, -static_cast<int>(X), static_cast<int>(X) + 1);
+        int fy = std::clamp(y, -static_cast<int>(Y), static_cast<int>(Y) + 1);
 
         return {
             X_CHUNK_HALF + (fx >> BITS),
@@ -168,20 +157,15 @@ public:
     }
 
     vec2<T> &get_point(unsigned int index) {
-        return points[index];
+        return points.at(index);
     }
 
     unsigned int add_point(const vec2<T> &v) {
-        if (v.x <= -X || v.x > X ||
-            v.y <= -Y || v.y > Y) {
+        if (v.x <= -X || v.x > X || v.y <= -Y || v.y > Y) {
             throw std::runtime_error("Out of bounds");
         }
-
         unsigned int id = next_id++;
-
-        auto [cx, cy] =
-                get_chunk_indexes(v.x, v.y);
-
+        auto [cx, cy] = get_chunk_indexes(v.x, v.y);
         chunks[cx][cy].push_back(id);
         points.push_back(v);
 
@@ -214,15 +198,15 @@ public:
         R dy = 0;
 
         if (position.x < chunk_min_x) {
-            dx = chunk_min_x - static_cast<R>(position.x);
+            dx = chunk_min_x - position.x;
         } else if (position.x > chunk_max_x) {
-            dx = static_cast<R>(position.x) - chunk_max_x;
+            dx = position.x - chunk_max_x;
         }
 
         if (position.y < chunk_min_y) {
-            dy = chunk_min_y - static_cast<R>(position.y);
+            dy = chunk_min_y - position.y;
         } else if (position.y > chunk_max_y) {
-            dy = static_cast<R>(position.y) - chunk_max_y;
+            dy = position.y - chunk_max_y;
         }
 
         if constexpr (C == Euclidean) {
@@ -234,71 +218,29 @@ public:
                 C == Euclidean || C == Manhattan,
                 "Unsupported distance algorithm"
             );
+
+            throw std::runtime_error("");
         }
     }
 
     template<DistanceAlgo C, Arithmetic R>
-    bool eval_chunk_distance(
-        const vec2<T> &position,
-        unsigned int cx,
-        unsigned int cy,
-        R range
-    ) const {
-        return calc_chunk_distance<C, R>(
-                   position,
-                   cx,
-                   cy
-               ) <= range;
+    bool eval_chunk_distance(const vec2<T> &position, unsigned int cx, unsigned int cy, R range) const {
+        return calc_chunk_distance<C, R>(position, cx, cy) <= range;
     }
 
     template<DistanceAlgo C, Arithmetic R>
-    std::vector<unsigned int>
-    query_range(
-        const vec2<T> &position,
-        R range
-    ) {
-        auto [min_cx, min_cy] =
-                get_chunk_indexes(
-                    position.x - range,
-                    position.y - range
-                );
-
-        auto [max_cx, max_cy] =
-                get_chunk_indexes(
-                    position.x + range,
-                    position.y + range
-                );
+    std::vector<unsigned int> query_range(const vec2<T> &position, R range) {
+        auto [min_cx, min_cy] = get_chunk_indexes(position.x - range, position.y - range);
+        auto [max_cx, max_cy] = get_chunk_indexes(position.x + range, position.y + range);
 
         std::vector<unsigned int> res;
 
-        for (unsigned int cx = min_cx;
-             cx <= max_cx;
-             ++cx) {
-            for (unsigned int cy = min_cy;
-                 cy <= max_cy;
-                 ++cy) {
-                if (chunks[cx][cy].empty()) {
-                    continue;
-                }
-
-                if (!eval_chunk_distance<C>(
-                    position,
-                    cx,
-                    cy,
-                    range
-                )) {
-                    continue;
-                }
-
+        for (unsigned int cx = min_cx; cx <= max_cx; ++cx) {
+            for (unsigned int cy = min_cy; cy <= max_cy; ++cy) {
                 for (unsigned int p: chunks[cx][cy]) {
-                    if (!eval_vec_distance<C>(
-                        position,
-                        points[p],
-                        range
-                    )) {
+                    if (!eval_vec_distance<C>(position, points[p], range)) {
                         continue;
                     }
-
                     res.push_back(p);
                 }
             }
@@ -307,405 +249,162 @@ public:
         return res;
     }
 
-    template<DistanceAlgo C, Arithmetic R>
-    std::vector<unsigned int>
-    query_range_nearest(
-        const vec2<T> &position,
-        R range
-    ) {
-        unsigned int max_cx;
-        unsigned int max_cy;
+private:
+    template<Arithmetic R>
+    R chunk_edge_min_x(int c) const { return static_cast<R>((c - static_cast<int>(X_CHUNK_HALF)) << BITS); }
 
+    template<Arithmetic R>
+    R chunk_edge_max_x(int c) const { return chunk_edge_min_x<R>(c) + (1 << BITS) - 1; }
+
+    template<Arithmetic R>
+    R chunk_edge_min_y(int c) const { return static_cast<R>((c - static_cast<int>(Y_CHUNK_HALF)) << BITS); }
+
+    template<Arithmetic R>
+    R chunk_edge_max_y(int c) const { return chunk_edge_min_y<R>(c) + (1 << BITS) - 1; }
+
+    /**
+     * position を中心としてリング状に探索範囲を広げていく
+     * @tparam C
+     * @tparam R
+     * @tparam CollectTies
+     * @tparam Visit
+     * @param position
+     * @param range
+     * @param on_candidate
+     */
+    template<DistanceAlgo C, Arithmetic R, bool CollectTies, class Visit>
+    void search_rings(const vec2<T> &position, R range, Visit &&on_candidate) {
+        // bug fixed by claude!
+        int min_cx, min_cy, max_cx, max_cy;
         if (range > X && range > Y) {
-            max_cx = X_CHUNK_HALF * 2 - 1;
-            max_cy = Y_CHUNK_HALF * 2 - 1;
+            min_cx = 0;
+            min_cy = 0;
+            max_cx = static_cast<int>(X_CHUNK_HALF) * 2 - 1;
+            max_cy = static_cast<int>(Y_CHUNK_HALF) * 2 - 1;
         } else {
-            auto [cx, cy] =
-                    get_chunk_indexes(
-                        position.x + range,
-                        position.y + range
-                    );
-
-            max_cx = cx;
-            max_cy = cy;
+            auto [lo_cx, lo_cy] = get_chunk_indexes(
+                static_cast<int>(position.x - range), static_cast<int>(position.y - range));
+            auto [hi_cx, hi_cy] = get_chunk_indexes(
+                static_cast<int>(position.x + range), static_cast<int>(position.y + range));
+            min_cx = static_cast<int>(lo_cx);
+            min_cy = static_cast<int>(lo_cy);
+            max_cx = static_cast<int>(hi_cx);
+            max_cy = static_cast<int>(hi_cy);
         }
 
-        const auto [mid_cx, mid_cy] =
-                get_chunk_indexes(
-                    position.x,
-                    position.y
-                );
+        auto [mcx, mcy] = get_chunk_indexes(position.x, position.y);
+        const int mid_cx = static_cast<int>(mcx);
+        const int mid_cy = static_cast<int>(mcy);
 
-        R min_dist = range;
+        R best;
+        if constexpr (C == Euclidean) best = range * range;
+        else best = range;
+        bool found = false;
 
-        std::vector<unsigned int> res;
-
-        const unsigned int max_radius =
-                std::max({
-                    mid_cx,
-                    mid_cy,
-                    max_cx - mid_cx,
-                    max_cy - mid_cy
-                });
-
-        auto check_chunk =
-                [&](unsigned int cx, unsigned int cy) {
-            if (chunks[cx][cy].empty()) {
+        auto scan_cell = [&](int cx, int cy) {
+            if (cx < min_cx || cx > max_cx || cy < min_cy || cy > max_cy) return;
+            auto &bucket = chunks[cx][cy];
+            if (bucket.empty()) return;
+            if (!eval_chunk_distance<C>(position, static_cast<unsigned int>(cx), static_cast<unsigned int>(cy), best))
                 return;
-            }
-
-            if (!eval_chunk_distance<C>(
-                position,
-                cx,
-                cy,
-                min_dist
-            )) {
-                return;
-            }
-
-            for (unsigned int p: chunks[cx][cy]) {
-                R dist =
-                        calc_vec_distance<C, T, R>(
-                            position,
-                            points[p]
-                        );
-
-                if (dist < min_dist) {
-                    min_dist = dist;
-                    res.clear();
-                    res.push_back(p);
-                } else if (dist == min_dist) {
-                    res.push_back(p);
+            for (unsigned int p: bucket) {
+                R dist = calc_vec_distance<C, T, R>(position, points[p]);
+                if (dist < best) {
+                    best = dist;
+                    found = true;
+                    on_candidate(p, dist, true);
+                } else if constexpr (CollectTies) {
+                    if (found && dist == best) {
+                        on_candidate(p, dist, false);
+                    }
                 }
             }
         };
 
-        for (unsigned int radius = 0;
-             radius <= max_radius;
-             ++radius) {
-            unsigned int min_cx =
-                    mid_cx > radius
-                        ? mid_cx - radius
-                        : 0;
+        const int max_radius = std::max({mid_cx - min_cx, max_cx - mid_cx, mid_cy - min_cy, max_cy - mid_cy});
 
-            unsigned int max_x =
-                    std::min(
-                        mid_cx + radius,
-                        max_cx
-                    );
-
-            unsigned int min_cy =
-                    mid_cy > radius
-                        ? mid_cy - radius
-                        : 0;
-
-            unsigned int max_y =
-                    std::min(
-                        mid_cy + radius,
-                        max_cy
-                    );
-
-            // 中心
+        for (int radius = 0; radius <= max_radius; ++radius) {
             if (radius == 0) {
-                check_chunk(mid_cx, mid_cy);
-                continue;
-            }
-
-            // 上辺・下辺
-            for (unsigned int cx = min_cx;
-                 cx <= max_x;
-                 ++cx) {
-                check_chunk(cx, min_cy);
-
-                if (max_y != min_cy) {
-                    check_chunk(cx, max_y);
+                scan_cell(mid_cx, mid_cy);
+            } else {
+                const int top = mid_cy - radius, bottom = mid_cy + radius;
+                const int left = mid_cx - radius, right = mid_cx + radius;
+                for (int cx = left; cx <= right; ++cx) {
+                    scan_cell(cx, top);
+                    scan_cell(cx, bottom);
+                }
+                for (int cy = top + 1; cy <= bottom - 1; ++cy) {
+                    scan_cell(left, cy);
+                    scan_cell(right, cy);
                 }
             }
 
-            // 左辺・右辺
-            for (unsigned int cy = min_cy + 1;
-                 cy < max_y;
-                 ++cy) {
-                check_chunk(min_cx, cy);
+            const bool left_open = (mid_cx - radius) > min_cx;
+            const bool right_open = (mid_cx + radius) < max_cx;
+            const bool top_open = (mid_cy - radius) > min_cy;
+            const bool bottom_open = (mid_cy + radius) < max_cy;
 
-                if (max_x != min_cx) {
-                    check_chunk(max_x, cy);
+            if (!left_open && !right_open && !top_open && !bottom_open) break;
+            if (!found) continue; // area remains and we have no candidate yet - keep expanding
+
+            bool have_gap = false;
+            R best_gap = R{};
+            auto consider = [&](R gap) {
+                if (!have_gap || gap < best_gap) {
+                    best_gap = gap;
+                    have_gap = true;
                 }
-            }
+            };
+            if (left_open) consider(static_cast<R>(position.x - chunk_edge_min_x<R>(mid_cx - radius) + 1));
+            if (right_open) consider(static_cast<R>(chunk_edge_max_x<R>(mid_cx + radius) - position.x + 1));
+            if (top_open) consider(static_cast<R>(position.y - chunk_edge_min_y<R>(mid_cy - radius) + 1));
+            if (bottom_open) consider(static_cast<R>(chunk_edge_max_y<R>(mid_cy + radius) - position.y + 1));
 
-            /*
-             * 現在の最短距離より外側にある
-             * チャンクだけになったら終了できる。
-             *
-             * 次の radius の最小チャンク距離を調べる。
-             */
-            if (radius < max_radius) {
-                const unsigned int next_radius =
-                        radius + 1;
+            if (!have_gap) break;
 
-                const unsigned int next_min_cx =
-                        mid_cx > next_radius
-                            ? mid_cx - next_radius
-                            : 0;
+            R gap_metric;
+            if constexpr (C == Euclidean) gap_metric = best_gap * best_gap;
+            else gap_metric = best_gap;
 
-                const unsigned int next_max_cx =
-                        std::min(
-                            mid_cx + next_radius,
-                            max_cx
-                        );
-
-                const unsigned int next_min_cy =
-                        mid_cy > next_radius
-                            ? mid_cy - next_radius
-                            : 0;
-
-                const unsigned int next_max_cy =
-                        std::min(
-                            mid_cy + next_radius,
-                            max_cy
-                        );
-
-                R next_min_chunk_dist =
-                        std::numeric_limits<R>::max();
-
-                auto update_min_chunk_distance =
-                        [&](unsigned int cx,
-                            unsigned int cy) {
-                    if (chunks[cx][cy].empty()) {
-                        return;
-                    }
-
-                    R d =
-                            calc_chunk_distance<C, R>(
-                                position,
-                                cx,
-                                cy
-                            );
-
-                    next_min_chunk_dist =
-                            std::min(
-                                next_min_chunk_dist,
-                                d
-                            );
-                };
-
-                for (unsigned int cx = next_min_cx;
-                     cx <= next_max_cx;
-                     ++cx) {
-                    update_min_chunk_distance(
-                        cx,
-                        next_min_cy
-                    );
-
-                    if (next_max_cy != next_min_cy) {
-                        update_min_chunk_distance(
-                            cx,
-                            next_max_cy
-                        );
-                    }
-                }
-
-                for (unsigned int cy = next_min_cy + 1;
-                     cy < next_max_cy;
-                     ++cy) {
-                    update_min_chunk_distance(
-                        next_min_cx,
-                        cy
-                    );
-
-                    if (next_max_cx != next_min_cx) {
-                        update_min_chunk_distance(
-                            next_max_cx,
-                            cy
-                        );
-                    }
-                }
-
-                if (next_min_chunk_dist >= min_dist) {
-                    break;
-                }
+            if constexpr (CollectTies) {
+                if (gap_metric > best) break;
+            } else {
+                if (gap_metric >= best) break;
             }
         }
+    }
 
+public:
+    template<DistanceAlgo C, Arithmetic R>
+    std::vector<unsigned int> query_range_nearest(const vec2<T> &position, R range) {
+        std::vector<unsigned int> res;
+        search_rings<C, R, true>(position, range, [&](unsigned int p, R /*dist*/, bool is_new_best) {
+            if (is_new_best) res.clear();
+            res.push_back(p);
+        });
         return res;
     }
 
     template<DistanceAlgo C, Arithmetic R>
-    std::optional<unsigned int>
-    get_range_nearest(
-        const vec2<T> &position,
-        R range
-    ) {
-        unsigned int max_cx;
-        unsigned int max_cy;
-
-        if (range == std::numeric_limits<R>::max()) {
-            max_cx = X_CHUNK_HALF * 2 - 1;
-            max_cy = Y_CHUNK_HALF * 2 - 1;
-        } else {
-            auto [cx, cy] =
-                    get_chunk_indexes(
-                        position.x + range,
-                        position.y + range
-                    );
-
-            max_cx = cx;
-            max_cy = cy;
-        }
-
-        const auto [mid_cx, mid_cy] =
-                get_chunk_indexes(
-                    position.x,
-                    position.y
-                );
-
-        R min_dist = range;
+    std::optional<unsigned int> get_range_nearest(const vec2<T> &position, R range) {
         unsigned int res = next_id;
-
-        const unsigned int max_radius =
-                std::max({
-                    mid_cx,
-                    mid_cy,
-                    max_cx - mid_cx,
-                    max_cy - mid_cy
-                });
-
-        auto check_chunk =
-                [&](unsigned int cx, unsigned int cy) {
-            const auto &chunk = chunks[cx][cy];
-
-            if (chunk.empty()) {
-                return;
-            }
-
-            /*
-             * get_nearest() なので、
-             * chunk_dist == min_dist の場合も
-             * 新しい nearest は存在しない。
-             */
-            const R chunk_dist =
-                    calc_chunk_distance<C, R>(
-                        position,
-                        cx,
-                        cy
-                    );
-
-            if (chunk_dist >= min_dist) {
-                return;
-            }
-
-            for (unsigned int p: chunks[cx][cy]) {
-                const R dist =
-                        calc_vec_distance<C, T, R>(
-                            position,
-                            points[p]
-                        );
-
-                if (dist < min_dist ||
-                    (dist == min_dist && p < res)) {
-                    min_dist = dist;
-                    res = p;
-                }
-            }
-        };
-
-        /*
-         * radius ごとの正方形全体ではなく、
-         * 「外周」だけを走査する。
-         *
-         * これによって同じチャンクを何度も
-         * 訪問することを防ぐ。
-         */
-        for (unsigned int radius = 0;
-             radius <= max_radius;
-             ++radius) {
-            const unsigned int min_cx =
-                    mid_cx > radius
-                        ? mid_cx - radius
-                        : 0;
-
-            const unsigned int max_x =
-                    std::min(
-                        mid_cx + radius,
-                        max_cx
-                    );
-
-            const unsigned int min_cy =
-                    mid_cy > radius
-                        ? mid_cy - radius
-                        : 0;
-
-            const unsigned int max_y =
-                    std::min(
-                        mid_cy + radius,
-                        max_cy
-                    );
-
-            /*
-             * radius == 0
-             *
-             * 中心チャンクのみ。
-             */
-            if (radius == 0) {
-                check_chunk(mid_cx, mid_cy);
-                continue;
-            }
-
-            /*
-             * 上辺・下辺
-             */
-            for (unsigned int cx = min_cx;
-                 cx <= max_x;
-                 ++cx) {
-                check_chunk(cx, min_cy);
-
-                if (max_y != min_cy) {
-                    check_chunk(cx, max_y);
-                }
-            }
-
-            /*
-             * 左辺・右辺
-             *
-             * 角は上辺・下辺ですでに処理済みなので、
-             * min_cy + 1 ～ max_y - 1 のみ。
-             */
-            for (unsigned int cy = min_cy + 1;
-                 cy < max_y;
-                 ++cy) {
-                check_chunk(min_cx, cy);
-
-                if (max_x != min_cx) {
-                    check_chunk(max_x, cy);
-                }
-            }
-        }
-
+        search_rings<C, R, false>(position, range, [&](unsigned int p, R /*dist*/, bool /*is_new_best*/) {
+            res = p;
+        });
         if (res == next_id) {
             return std::nullopt;
         }
-
         return res;
     }
 
     template<DistanceAlgo C>
     std::vector<unsigned int> query_nearest(const vec2<T> &position) {
-        using R = long long;
-
-        return query_range_nearest<C, R>(
-            position,
-            std::numeric_limits<R>::max()
-        );
+        return query_range_nearest<C, long long>(position, INT_MAX);
     }
 
     template<DistanceAlgo C>
     std::optional<unsigned int> get_nearest(const vec2<T> &position) {
-        using R = long long;
-
-        return get_range_nearest<C, R>(
-            position,
-            std::numeric_limits<R>::max()
-        );
+        return get_range_nearest<C, long long>(position, INT_MAX);
     }
 };
 
