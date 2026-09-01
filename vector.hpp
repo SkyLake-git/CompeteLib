@@ -160,6 +160,9 @@ public:
         return points.at(index);
     }
 
+    /**
+     * 計算量 O(1)
+     */
     unsigned int add_point(const vec2<T> &v) {
         if (v.x <= -X || v.x > X || v.y <= -Y || v.y > Y) {
             throw std::runtime_error("Out of bounds");
@@ -228,6 +231,9 @@ public:
         return calc_chunk_distance<C, R>(position, cx, cy) <= range;
     }
 
+    /**
+     * 最悪計算量 O(N + C)
+     */
     template<DistanceAlgo C, Arithmetic R>
     std::vector<unsigned int> query_range(const vec2<T> &position, R range) {
         auto [min_cx, min_cy] = get_chunk_indexes(position.x - range, position.y - range);
@@ -264,13 +270,6 @@ private:
 
     /**
      * position を中心としてリング状に探索範囲を広げていく
-     * @tparam C
-     * @tparam R
-     * @tparam CollectTies
-     * @tparam Visit
-     * @param position
-     * @param range
-     * @param on_candidate
      */
     template<DistanceAlgo C, Arithmetic R, bool CollectTies, class Visit>
     void search_rings(const vec2<T> &position, R range, Visit &&on_candidate) {
@@ -375,6 +374,12 @@ private:
     }
 
 public:
+    /**
+     * K = 条件を満たした点の数
+     * C = 範囲内に含まれるチャンクの数
+     * 最良計算量 O(1)
+     * 最悪計算量 O(N + C)
+     */
     template<DistanceAlgo C, Arithmetic R>
     std::vector<unsigned int> query_range_nearest(const vec2<T> &position, R range) {
         std::vector<unsigned int> res;
@@ -385,6 +390,12 @@ public:
         return res;
     }
 
+    /**
+     * K = 条件を満たした点の数
+     * C = 範囲内に含まれるチャンクの数
+     * 最良計算量 O(1)
+     * 最悪計算量 O(N + C)
+     */
     template<DistanceAlgo C, Arithmetic R>
     std::optional<unsigned int> get_range_nearest(const vec2<T> &position, R range) {
         unsigned int res = next_id;
@@ -397,11 +408,23 @@ public:
         return res;
     }
 
+    /**
+     * K = 条件を満たした点の数
+     * C = チャンクの数
+     * 最良計算量 O(1)
+     * 最悪計算量 O(N + C)
+     */
     template<DistanceAlgo C>
     std::vector<unsigned int> query_nearest(const vec2<T> &position) {
         return query_range_nearest<C, long long>(position, INT_MAX);
     }
 
+    /**
+     * K = 条件を満たした点の数
+     * C = チャンクの数
+     * 最良計算量 O(1)
+     * 最悪計算量 O(N + C)
+     */
     template<DistanceAlgo C>
     std::optional<unsigned int> get_nearest(const vec2<T> &position) {
         return get_range_nearest<C, long long>(position, INT_MAX);
