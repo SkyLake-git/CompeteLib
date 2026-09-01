@@ -3,7 +3,7 @@
 #include <queue>
 #include <stack>
 
-#include "typings.hpp"
+#include "lib/typings.hpp"
 
 namespace search {
 }

@@ -2,8 +2,12 @@
 #define ATCODERC_TYPINGS_HPP
 #include <type_traits>
 
+
 template<typename T>
 concept Arithmetic = std::is_arithmetic_v<T>;
+
+template<typename T>
+concept FloatingPoint = std::is_floating_point_v<T>;
 
 template<typename T>
 concept GraphLike = requires(T &a)
@@ -19,6 +23,10 @@ concept GridLike = requires(T &a)
     sizeof(a);
 };
 
+enum DistanceAlgo {
+    Euclidean,
+    Manhattan
+};
 
 template<typename T>
 concept DataContainer = requires
