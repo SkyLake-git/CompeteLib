@@ -108,6 +108,9 @@ namespace graph::directed {
 }
 
 namespace graph::undirected {
+    /**
+     * atcoder/dsu を利用することも検討してください
+     */
     inline std::vector<edge<int>> detect_cycle(std::vector<std::vector<edge<int>>> &graph) {
         cycle_detector detector(graph);
         return detector.detect(true);

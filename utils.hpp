@@ -43,7 +43,7 @@ inline long double randf() {
                long>::max();
 }
 
-inline std::generator<int> range_dfs(int min, int max, int start) {
+inline std::generator<int> range_bfs(int min, int max, int start) {
     co_yield start;
     for (int d = 1; d <= max - min; ++d) {
         int right = start + d;
@@ -58,8 +58,19 @@ inline std::generator<int> range_dfs(int min, int max, int start) {
 }
 
 // (min + max) / 2 から1ずつmin, maxに近づいていく数列を返す
-inline std::generator<int> range_mid_dfs(int min, int max) {
-    return range_dfs(min, max, (min + max) / 2);
+inline std::generator<int> range_mid_bfs(int min, int max) {
+    return range_bfs(min, max, (min + max) / 2);
+}
+
+template<typename T>
+std::ostream &operator<<(std::ostream &os, std::vector<T> arr) {
+    std::string s = "[ ";
+    for (int i = 0; i < arr.size(); ++i) {
+        s.append(std::to_string(arr[i]) + ", ");
+    }
+
+    os << s << "]";
+    return os;
 }
 
 inline void hack_syncio() {
