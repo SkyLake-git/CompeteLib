@@ -19,7 +19,7 @@ struct stopwatch {
 
     stopwatch() = default;
 
-    long long elapsed_ms() const {
+    [[nodiscard]] long long elapsed_ms() const {
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).
                 count();
     }
@@ -47,12 +47,17 @@ namespace timer {
     }
 }
 
-
+/**
+ * [min_val, max_val]
+ */
 inline unsigned long long randl_range(unsigned long long min_val, unsigned long long max_val) {
     std::uniform_int_distribution get_rand_uni_int(min_val, max_val);
     return get_rand_uni_int(rnd_mt64);
 }
 
+/**
+ * [min_val, max_val]
+ */
 inline unsigned int randi_range(unsigned int min_val, unsigned int max_val) {
     std::uniform_int_distribution get_rand_uni_int(min_val, max_val);
     return get_rand_uni_int(rnd_mt64);
