@@ -14,18 +14,39 @@
 
 static std::mt19937_64 rnd_mt64(100);
 
-namespace timer {
-    static std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();
+struct stopwatch {
+    std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();
 
-    inline long long elapsed_ms() {
+    stopwatch() = default;
+
+    long long elapsed_ms() const {
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).
                 count();
     }
 
-    inline void reset() {
+    void reset() {
         start_time = std::chrono::steady_clock::now();
     }
+};
+
+namespace timer {
+    static stopwatch _internal_stopwatch{};
+    static long long _limit{};
+
+    inline void start(long long limit) {
+        _limit = limit;
+        _internal_stopwatch.reset();
+    }
+
+    inline bool is_timeout() {
+        return _internal_stopwatch.elapsed_ms() >= _limit;
+    }
+
+    inline void reset() {
+        return _internal_stopwatch.reset();
+    }
 }
+
 
 inline unsigned long long randl_range(unsigned long long min_val, unsigned long long max_val) {
     std::uniform_int_distribution get_rand_uni_int(min_val, max_val);
