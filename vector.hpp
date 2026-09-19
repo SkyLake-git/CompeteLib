@@ -122,6 +122,8 @@ bool eval_vec_distance(const vec2<T> &a, const vec2<T> &b, R range) {
  * 点が広く分布している・範囲がそれなりに広い・点の数がそれなりに多い 場合に有効です。
  * それ以外の場合は、全探索の方が高速な場合が多いことに注意してください。
  *
+ * @authors SkyLake, Claude
+ *
  * @tparam T @see {vec2}
  * @tparam X x の最大範囲 [-x, x)
  * @tparam Y y の最大範囲 [-y, y)

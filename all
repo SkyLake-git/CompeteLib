@@ -1,6 +1,17 @@
-#include "lib/necessary_all"
+// -- Library for heuristic contest (This library contains AI-generated code)
+// https://github.com/SkyLake-git/CompeteLib/blob/main/all
+// repo: https://github.com/SkyLake-git/CompeteLib
+#include "lib/typings"
+#include "lib/numerics"
+#include "lib/records"
+#include "lib/debug"
+#include "lib/utils"
+#include "lib/arrays"
 #include "lib/vector"
 #include "lib/compare"
 #include "lib/strings"
 #include "lib/graph"
 #include "lib/meta_heuristics"
+
+#include "lib/usings"
+// -- Library End

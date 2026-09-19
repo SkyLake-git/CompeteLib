@@ -1,0 +1,12 @@
+// -- Library for normal contest (This library doesn't contain any AI-generated code)
+// https://github.com/SkyLake-git/CompeteLib/blob/main/compete
+// repo: https://github.com/SkyLake-git/CompeteLib
+#include "lib/typings"
+#include "lib/numerics"
+#include "lib/records"
+#include "lib/debug"
+#include "lib/utils"
+#include "lib/arrays"
+
+#include "lib/usings"
+// -- Library End

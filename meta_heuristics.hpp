@@ -38,19 +38,23 @@ struct simulated_annealing {
         double current_temperature = temperature + (target_temperature - temperature) * slope;
 
         T diff = new_score - score;
+        if (diff > 0) {
+            return true;
+        }
+
         return exp(static_cast<double>(diff) / current_temperature) > randf();
     }
 };
 
 template<class T>
-concept ImmutableState =
+concept SequentialState =
         requires
         {
             typename T::operation_type;
         } &&
         std::derived_from<T, abstract_sequential_state<typename T::operation_type>>;
 
-template<ImmutableState T>
+template<SequentialState T>
 struct beam_search {
     using operation_type = T::operation_type;
 
@@ -83,16 +87,20 @@ public:
             return beam.front();
         }
 
-        std::ranges::sort(next_beam, [](const auto &a, const auto &b) {
-            return a.score > b.score;
-        });
+        int effective_beam_width = std::min(beam_width, static_cast<int>(next_beam.size()));
+
+        std::nth_element(next_beam.begin(),
+                         next_beam.begin() + effective_beam_width,
+                         next_beam.end(),
+                         [](const auto &a, const auto &b) {
+                             return a.score > b.score;
+                         });
         std::vector<T> composited_beam;
-        for (int i = 0; i < std::min(beam_width, static_cast<int>(next_beam.size())); ++i) {
+        for (int i = 0; i < effective_beam_width; ++i) {
             T new_state = beam[next_beam[i].state_index];
             new_state.next(next_beam[i].operation);
             composited_beam.push_back(std::move(new_state));
         }
-        beam.clear();
         beam = std::move(composited_beam);
 
         return beam.front();

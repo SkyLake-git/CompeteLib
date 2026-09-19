@@ -1,7 +1,0 @@
-// https://github.com/SkyLake-git/CompeteLib
-#include "lib/typings"
-#include "lib/numerics"
-#include "lib/records"
-#include "lib/debug"
-#include "lib/utils"
-#include "lib/arrays"
