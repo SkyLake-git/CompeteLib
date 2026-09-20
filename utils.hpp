@@ -98,12 +98,4 @@ std::ostream &operator<<(std::ostream &os, std::vector<T> arr) {
     os << s << "]";
     return os;
 }
-
-inline void hack_syncio() {
-#ifdef ONLINE_JUDGE
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-#endif
-}
-
 #endif //ATCODERC_UTILS_HPP
