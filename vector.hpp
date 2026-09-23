@@ -127,12 +127,12 @@ struct vec2i_hasher {
         return static_cast<long long>(x) * Y + y;
     }
 
-    long long encode(const vec2i &v) {
+    long long encode(const vec2<int> &v) {
         return encode_from(v.x, v.y);
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    vec2i decode(long long value) {
+    vec2<int> decode(long long value) {
         assert(0 <= value && value < static_cast<long long>(X) * Y);
 
         return {

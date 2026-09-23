@@ -19,4 +19,11 @@ void debug_arr(auto arr, const T size) {
     std::cerr << "]" << std::endl;
 #endif
 }
+
+#ifdef ONLINE_JUDGE
+constexpr bool IS_ONLINE_JUDGE = true;
+#else
+constexpr bool IS_ONLINE_JUDGE = false;
+#endif
+
 #endif //ATCODERC_DEBUG_HPP

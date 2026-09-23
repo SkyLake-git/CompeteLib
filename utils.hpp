@@ -98,4 +98,25 @@ std::ostream &operator<<(std::ostream &os, std::vector<T> arr) {
     os << s << "]";
     return os;
 }
+
+// bypass clangd lifehack
+#ifdef ONLINE_JUDGE
+std::string format_patched(
+    const std::string &fmt,
+    const auto &... args) {
+    return std::vformat(fmt, std::make_format_args(args...));
+}
+#else
+#include <fmt/format.h>
+
+std::string format_patched(
+    const std::string &fmt,
+    const auto &... args) {
+    return fmt::format(fmt::runtime(fmt), args...);
+}
+#endif
+
+inline std::string format_percentage(double value) {
+    return format_patched("{:.1f}%", value * 100);
+}
 #endif //ATCODERC_UTILS_HPP

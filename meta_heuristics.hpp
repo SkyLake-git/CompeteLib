@@ -15,24 +15,39 @@ struct abstract_sequential_state {
     virtual long long get_score() const = 0;
 };
 
+template<Arithmetic T>
 struct simulated_annealing {
+    struct analytics {
+        int iterations{};
+        int accepted{};
+        int rejected{};
+        T score_balance{};
+    };
+
+    struct neighbor_data {
+        int label{};
+    };
+
     double temperature;
     double target_temperature;
     long long time_limit;
     stopwatch sa_stopwatch{};
+    std::unordered_map<int, analytics> sa_analytics;
+    bool analytics_enabled;
+
 
     explicit simulated_annealing(double initial_temperature, double target_temperature, long long time_limit) {
         temperature = initial_temperature;
         this->target_temperature = target_temperature;
         this->time_limit = time_limit;
+        this->analytics_enabled = !IS_ONLINE_JUDGE;
     }
 
     bool timeout() const {
         return sa_stopwatch.elapsed_ms() >= time_limit;
     }
 
-    template<Arithmetic T>
-    bool should_accept(T score, T new_score) {
+    bool should_accept(T score, T new_score, const neighbor_data &data) {
         double slope = static_cast<double>(sa_stopwatch.elapsed_ms()) / time_limit;
 
         double current_temperature = temperature + (target_temperature - temperature) * slope;
@@ -42,7 +57,65 @@ struct simulated_annealing {
             return true;
         }
 
-        return exp(static_cast<double>(diff) / current_temperature) > randf();
+        bool res = exp(static_cast<double>(diff) / current_temperature) > randf();
+
+        if (analytics_enabled) {
+            ++sa_analytics[data.label].iterations;
+            if (res) {
+                sa_analytics[data.label].score_balance += diff;
+                ++sa_analytics[data.label].accepted;
+                return true;
+            }
+            ++sa_analytics[data.label].rejected;
+            return false;
+        }
+
+        return res;
+    }
+
+    bool should_accept(T score, T new_score) {
+        return should_accept(score, new_score, neighbor_data{-1});
+    }
+
+    void print_analytics() const {
+        if (!analytics_enabled) {
+            std::cerr << "simulated_annealing: analytics disabled" << "\n";
+            return;
+        }
+        analytics aggregated_analytics;
+
+        std::string iterations_breakdown;
+        for (const analytics &label_analytics: sa_analytics | std::views::values) {
+            aggregated_analytics.iterations += label_analytics.iterations;
+            aggregated_analytics.accepted += label_analytics.accepted;
+            aggregated_analytics.rejected += label_analytics.rejected;
+            aggregated_analytics.score_balance += label_analytics.score_balance;
+        }
+
+        for (auto &[label, label_analytics]: sa_analytics) {
+            iterations_breakdown += format_patched(
+                "- {:<4}: iterations {:>5} ({:>5}/{:<5}), accepted {:>5} ({:>5}/{:<5}), rejected {:>5} ({:>5}/{:<5}), score balance: {}\n",
+                label,
+                format_percentage(static_cast<double>(label_analytics.iterations) / aggregated_analytics.iterations),
+                label_analytics.iterations,
+                aggregated_analytics.iterations,
+                format_percentage(static_cast<double>(label_analytics.accepted) / aggregated_analytics.accepted),
+                label_analytics.accepted,
+                aggregated_analytics.accepted,
+                format_percentage(static_cast<double>(label_analytics.rejected) / aggregated_analytics.rejected),
+                label_analytics.rejected,
+                aggregated_analytics.rejected,
+                label_analytics.score_balance
+            );
+        }
+
+
+        std::cerr << "-- simulated_annealing: analytics --" << "\n";
+        std::cerr << "iterations   : " << aggregated_analytics.iterations << "\n";
+        std::cerr << "accepted     : " << aggregated_analytics.accepted << "\n";
+        std::cerr << "rejected     : " << aggregated_analytics.rejected << "\n";
+        std::cerr << "score balance: " << aggregated_analytics.score_balance << "\n";
+        std::cerr << iterations_breakdown << "\n";
     }
 };
 
