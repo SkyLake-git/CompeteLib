@@ -4,6 +4,7 @@
 #include <ios>
 #include <iostream>
 #include <random>
+#include <cstdlib>
 #include <generator>
 
 #define No cout << "No" << endl
@@ -119,4 +120,33 @@ std::string format_patched(
 inline std::string format_percentage(double value) {
     return format_patched("{:.1f}%", value * 100);
 }
+
+inline int getenv_int(const char *name, const int fallback) {
+    const char *val = getenv(name);
+    if (val == nullptr) {
+        return fallback;
+    }
+    return std::stoi(val);
+}
+
+inline long long getenv_ll(const char *name, const long long fallback) {
+    const char *val = getenv(name);
+    if (val == nullptr) {
+        return fallback;
+    }
+    return std::stoll(val);
+}
+
+inline double getenv_double(const char *name, const double fallback) {
+    const char *val = getenv(name);
+    if (val == nullptr) {
+        return fallback;
+    }
+    return std::stod(val);
+}
+
+#define hyperparameter_int(val_name, env_name, fallback) const static int val_name = getenv_int(env_name, fallback)
+#define hyperparameter_ll(val_name, env_name, fallback) const static long long val_name = getenv_ll(env_name, fallback)
+#define hyperparameter_double(val_name, env_name, fallback) const static double val_name = getenv_double(env_name, fallback)
+
 #endif //ATCODERC_UTILS_HPP
