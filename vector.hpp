@@ -130,24 +130,56 @@ struct vec2i_hasher {
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    long long encode_from(int x, int y) {
+    long long encode_from(int x, int y) const {
         assert(0 <= x && x < size_x);
         assert(0 <= y && y < size_y);
         return static_cast<long long>(x) * size_y + y;
     }
 
-    long long encode(const vec2<int> &v) {
+    long long encode(const vec2<int> &v) const {
         return encode_from(v.x, v.y);
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    vec2<int> decode(long long value) {
+    vec2<int> decode(long long value) const {
         assert(0 <= value && value < static_cast<long long>(size_x) * size_y);
 
         return {
             static_cast<int>(value / size_y),
             static_cast<int>(value % size_y),
         };
+    }
+
+    std::size_t operator()(const vec2<int> &v) const {
+        return cast(encode(v), std::size_t);
+    }
+};
+
+template<int X, int Y>
+struct immutable_vec2i_hasher {
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    long long encode_from(int x, int y) const {
+        assert(0 <= x && x < X);
+        assert(0 <= y && y < Y);
+        return static_cast<long long>(x) * Y + y;
+    }
+
+    long long encode(const vec2<int> &v) const {
+        return encode_from(v.x, v.y);
+    }
+
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    vec2<int> decode(long long value) const {
+        assert(0 <= value && value < static_cast<long long>(X) * Y);
+
+        return {
+            static_cast<int>(value / Y),
+            static_cast<int>(value % Y),
+        };
+    }
+
+    std::size_t operator()(const vec2<int> &v) const {
+        return cast(encode(v), std::size_t);
     }
 };
 
