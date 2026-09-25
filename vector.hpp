@@ -113,18 +113,27 @@ bool eval_vec_distance(const vec2<T> &a, const vec2<T> &b, R range) {
     }
 }
 
-/**
- *
- * @tparam X [0, x)
- * @tparam Y [0, y)
- */
-template<int X, int Y>
 struct vec2i_hasher {
+    int size_x;
+    int size_y;
+
+    /**
+     * @param x [0, x)
+     * @param y [0, y)
+     */
+    vec2i_hasher(int x, int y) : size_x(x), size_y(y) {
+    }
+
+    void change(int size_x, int size_y) {
+        this->size_x = size_x;
+        this->size_y = size_y;
+    }
+
     // ReSharper disable once CppMemberFunctionMayBeStatic
     long long encode_from(int x, int y) {
-        assert(0 <= x && x < X);
-        assert(0 <= y && y < Y);
-        return static_cast<long long>(x) * Y + y;
+        assert(0 <= x && x < size_x);
+        assert(0 <= y && y < size_y);
+        return static_cast<long long>(x) * size_y + y;
     }
 
     long long encode(const vec2<int> &v) {
@@ -133,11 +142,11 @@ struct vec2i_hasher {
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
     vec2<int> decode(long long value) {
-        assert(0 <= value && value < static_cast<long long>(X) * Y);
+        assert(0 <= value && value < static_cast<long long>(size_x) * size_y);
 
         return {
-            static_cast<int>(value / Y),
-            static_cast<int>(value % Y),
+            static_cast<int>(value / size_y),
+            static_cast<int>(value % size_y),
         };
     }
 };

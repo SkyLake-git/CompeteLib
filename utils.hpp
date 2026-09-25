@@ -149,4 +149,10 @@ inline double getenv_double(const char *name, const double fallback) {
 #define hyperparameter_ll(val_name, env_name, fallback) const static long long val_name = getenv_ll(env_name, fallback)
 #define hyperparameter_double(val_name, env_name, fallback) const static double val_name = getenv_double(env_name, fallback)
 
+constexpr int E5 = 100'000;
+constexpr int E6 = 1'000'000;
+constexpr int E7 = 10'000'000;
+constexpr int E8 = 100'000'000;
+constexpr int E9 = 1'000'000'000;
+
 #endif //ATCODERC_UTILS_HPP
