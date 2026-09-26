@@ -7,8 +7,8 @@
 #include <cstdlib>
 #include <generator>
 
-#define No cout << "No" << endl
-#define Yes cout << "Yes" << endl
+#define No cout << "No\n"
+#define Yes cout << "Yes\n"
 #define zerofill(obj) memset(obj, 0, sizeof(obj))
 #define nonefill(obj) memset(obj, -1, sizeof(obj))
 #define cast(obj, t) static_cast<t>(obj)

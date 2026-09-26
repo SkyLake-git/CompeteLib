@@ -146,7 +146,7 @@ public:
         beam.push_back(origin_state);
     }
 
-    T &next() {
+    std::pair<T, bool> next() {
         std::vector<candidate> next_beam;
 
         for (int i = 0; i < static_cast<int>(beam.size()); ++i) {
@@ -157,26 +157,28 @@ public:
         }
 
         if (next_beam.empty()) {
-            return beam.front();
+            return {beam.front(), false};
         }
 
         int effective_beam_width = std::min(beam_width, static_cast<int>(next_beam.size()));
 
-        std::nth_element(next_beam.begin(),
-                         next_beam.begin() + effective_beam_width,
-                         next_beam.end(),
-                         [](const auto &a, const auto &b) {
-                             return a.score > b.score;
-                         });
+        std::ranges::sort(next_beam, [](const auto &a, const auto &b) {
+            return a.score > b.score;
+        });
         std::vector<T> composited_beam;
         for (int i = 0; i < effective_beam_width; ++i) {
             T new_state = beam[next_beam[i].state_index];
-            new_state.next(next_beam[i].operation);
-            composited_beam.push_back(std::move(new_state));
+            if (new_state.next(next_beam[i].operation)) {
+                composited_beam.push_back(std::move(new_state));
+            }
+        }
+
+        if (composited_beam.empty()) {
+            return {beam.front(), false};
         }
         beam = std::move(composited_beam);
 
-        return beam.front();
+        return {beam.front(), true};
     }
 };
 
