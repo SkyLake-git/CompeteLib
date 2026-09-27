@@ -12,7 +12,6 @@ struct abstract_sequential_state {
     virtual bool next(const Operation &) = 0;
     virtual std::generator<Operation> expand() const = 0;
     virtual long long calculate_next_score(const Operation &) const = 0;
-    virtual long long get_score() const = 0;
 };
 
 template<Arithmetic T>
@@ -150,9 +149,8 @@ public:
         std::vector<candidate> next_beam;
 
         for (int i = 0; i < static_cast<int>(beam.size()); ++i) {
-            const T &state = beam[i];
-            for (auto next_op: state.expand()) {
-                next_beam.emplace_back(state.calculate_next_score(next_op), i, next_op);
+            for (auto next_op: beam[i].expand()) {
+                next_beam.emplace_back(beam[i].calculate_next_score(next_op), i, next_op);
             }
         }
 
