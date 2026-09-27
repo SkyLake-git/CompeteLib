@@ -83,13 +83,8 @@ struct vec2 {
     }
 };
 
-struct vec2i : vec2<int> {
-    using vec2::vec2;
-};
-
-struct vec2l : vec2<long long> {
-    using vec2::vec2;
-};
+using vec2i = vec2<int>;
+using vec2l = vec2<long long>;
 
 template<DistanceAlgo C, Arithmetic T, Arithmetic R>
 R calc_vec_distance(const vec2<T> &a, const vec2<T> &b) {
