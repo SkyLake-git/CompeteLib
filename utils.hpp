@@ -89,6 +89,15 @@ inline std::generator<int> range_mid_bfs(int min, int max) {
     return range_bfs(min, max, (min + max) / 2);
 }
 
+inline std::string join(const std::string &delimiter, const std::vector<std::string> &target) {
+    std::string res;
+    for (int i = 0; i < target.size() - 1; ++i) {
+        res += target[i] + delimiter;
+    }
+
+    return res + target.back();
+}
+
 template<typename T>
 std::ostream &operator<<(std::ostream &os, std::vector<T> arr) {
     std::string s = "[ ";
