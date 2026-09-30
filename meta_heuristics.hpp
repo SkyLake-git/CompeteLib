@@ -1,16 +1,22 @@
 #ifndef ATCODERC_META_HEURISTICS_HPP
 #define ATCODERC_META_HEURISTICS_HPP
 #include <algorithm>
+#include <unordered_map>
 
+#include "debug.hpp"
 #include "typings.hpp"
 #include "utils.hpp"
 
 template<class Operation>
 struct abstract_sequential_state {
     using operation_type = Operation;
+
     virtual ~abstract_sequential_state() = default;
+
     virtual bool next(const Operation &) = 0;
+
     virtual std::generator<Operation> expand() const = 0;
+
     virtual long long calculate_next_score(const Operation &) const = 0;
 };
 
@@ -128,6 +134,13 @@ concept SequentialState =
 
 template<SequentialState T>
 struct beam_search {
+    struct analytics {
+        int iterations;
+        int accepted;
+        int discarded;
+        int total_neighbors;
+    };
+
     using operation_type = T::operation_type;
 
 protected:
@@ -140,9 +153,12 @@ protected:
 public:
     int beam_width{};
     std::vector<T> beam{};
+    analytics bs_analytics{};
+    bool analytics_enabled{};
 
     explicit beam_search(T origin_state, int beam_width) : beam_width(beam_width) {
         beam.push_back(origin_state);
+        analytics_enabled = !IS_ONLINE_JUDGE;
     }
 
     std::pair<T, bool> next() {
@@ -168,7 +184,15 @@ public:
             T new_state = beam[next_beam[i].state_index];
             if (new_state.next(next_beam[i].operation)) {
                 composited_beam.push_back(std::move(new_state));
+                if (analytics_enabled) {
+                    bs_analytics.accepted++;
+                }
             }
+        }
+
+        if (analytics_enabled) {
+            bs_analytics.iterations++;
+            bs_analytics.discarded += static_cast<int>(next_beam.size()) - effective_beam_width;
         }
 
         if (composited_beam.empty()) {

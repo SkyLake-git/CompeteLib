@@ -1,6 +1,8 @@
 #ifndef ATCODERC_VECTOR_HPP
 #define ATCODERC_VECTOR_HPP
+#include <cassert>
 #include <cmath>
+#include <ostream>
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
@@ -80,6 +82,10 @@ struct vec2 {
 
     bool operator!=(const vec2 &another) const {
         return !(*this == another);
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const vec2 &obj) {
+        return os << "x: " << obj.x << " y: " << obj.y;
     }
 };
 
