@@ -1,7 +1,7 @@
 #ifndef ATCODERC_META_HEURISTICS_HPP
 #define ATCODERC_META_HEURISTICS_HPP
 #include <algorithm>
-#include <unordered_map>
+#include <unordered_set>
 
 #include "debug.hpp"
 #include "typings.hpp"
@@ -10,14 +10,12 @@
 template<class Operation>
 struct abstract_sequential_state {
     using operation_type = Operation;
-
     virtual ~abstract_sequential_state() = default;
-
     virtual bool next(const Operation &) = 0;
-
     virtual std::generator<Operation> expand() const = 0;
-
     virtual long long calculate_next_score(const Operation &) const = 0;
+    virtual bool is_terminal() const { return false; }
+    virtual std::optional<unsigned long long> next_hash(const Operation &) const { return std::nullopt; }
 };
 
 template<Arithmetic T>
@@ -145,62 +143,80 @@ struct beam_search {
 
 protected:
     struct candidate {
-        long long score;
-        std::size_t state_index;
+        long long score{};
+        std::size_t state_index{};
         operation_type operation;
+        std::optional<unsigned long long> hash;
     };
 
 public:
     int beam_width{};
     std::vector<T> beam{};
+    std::vector<T> terminals{};
     analytics bs_analytics{};
     bool analytics_enabled{};
 
     explicit beam_search(T origin_state, int beam_width) : beam_width(beam_width) {
-        beam.push_back(origin_state);
+        beam.push_back(std::move(origin_state));
         analytics_enabled = !IS_ONLINE_JUDGE;
     }
 
-    std::pair<T, bool> next() {
+    bool step() {
         std::vector<candidate> next_beam;
-
         for (int i = 0; i < static_cast<int>(beam.size()); ++i) {
-            for (auto next_op: beam[i].expand()) {
-                next_beam.emplace_back(beam[i].calculate_next_score(next_op), i, next_op);
+            for (auto &&next_op: beam[i].expand()) {
+                const long long score = beam[i].calculate_next_score(next_op);
+                const std::optional<unsigned long long> hash = beam[i].next_hash(next_op);
+                next_beam.emplace_back(score, static_cast<std::size_t>(i), std::move(next_op), hash);
             }
         }
-
         if (next_beam.empty()) {
-            return {beam.front(), false};
+            return false;
         }
 
-        int effective_beam_width = std::min(beam_width, static_cast<int>(next_beam.size()));
-
-        std::ranges::sort(next_beam, [](const auto &a, const auto &b) {
+        std::ranges::stable_sort(next_beam, [](const candidate &a, const candidate &b) {
             return a.score > b.score;
         });
+
         std::vector<T> composited_beam;
-        for (int i = 0; i < effective_beam_width; ++i) {
-            T new_state = beam[next_beam[i].state_index];
-            if (new_state.next(next_beam[i].operation)) {
-                composited_beam.push_back(std::move(new_state));
-                if (analytics_enabled) {
-                    bs_analytics.accepted++;
-                }
+        std::unordered_set<unsigned long long> seen;
+        for (const candidate &c: next_beam) {
+            if (static_cast<int>(composited_beam.size()) >= beam_width) {
+                break;
             }
+            if (c.hash.has_value() && !seen.insert(*c.hash).second) {
+                continue;
+            }
+            T new_state = beam[c.state_index];
+            if (!new_state.next(c.operation)) {
+                continue;
+            }
+            composited_beam.push_back(std::move(new_state));
+            if (analytics_enabled) {
+                ++bs_analytics.accepted;
+            }
+            if (new_state.is_terminal()) {
+                terminals.push_back(std::move(new_state));
+                continue;
+            }
+            composited_beam.push_back(std::move(new_state));
         }
 
         if (analytics_enabled) {
-            bs_analytics.iterations++;
-            bs_analytics.discarded += static_cast<int>(next_beam.size()) - effective_beam_width;
+            ++bs_analytics.iterations;
+            bs_analytics.discarded += static_cast<int>(next_beam.size()) - static_cast<int>(composited_beam.size());
         }
 
         if (composited_beam.empty()) {
-            return {beam.front(), false};
+            return false;
         }
         beam = std::move(composited_beam);
+        return true;
+    }
 
-        return {beam.front(), true};
+    std::pair<T, bool> next() {
+        const bool advanced = step();
+        return {beam.front(), advanced};
     }
 };
 

@@ -1,6 +1,7 @@
 // -- Library for normal contest (This library doesn't contain any AI-generated code)
 // https://github.com/SkyLake-git/CompeteLib/blob/main/compete
 // repo: https://github.com/SkyLake-git/CompeteLib
+// compete BEGIN_NO_NEW_LINES
 #include "lib/typings"
 #include "lib/numerics"
 #include "lib/records"
@@ -10,4 +11,5 @@
 
 #include "lib/initializer"
 #include "lib/usings"
+// compete END_NO_NEW_LINES
 // -- Library End

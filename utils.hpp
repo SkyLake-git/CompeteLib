@@ -12,6 +12,8 @@
 #define zerofill(obj) memset(obj, 0, sizeof(obj))
 #define nonefill(obj) memset(obj, -1, sizeof(obj))
 #define cast(obj, t) static_cast<t>(obj)
+#define cint(obj) static_cast<int>(obj)
+#define cll(obj) static_cast<ll>(obj)
 
 static std::mt19937_64 rnd_mt64(100);
 
