@@ -57,7 +57,6 @@ T ceil_div(T a, T b) {
         a *= -1, b *= -1;
     if (a <= 0)
         return a / b;
-
     return (a - 1) / b + 1;
 }
 
