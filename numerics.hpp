@@ -73,5 +73,26 @@ inline long long floor_ll(const long double a) {
     return static_cast<long long>(std::floorl(a));
 }
 
+// bit の nbit 目が 1 かどうか判定する
+// 0 <= nbit < 63
+inline bool bit_has(long long bit, int nbit) {
+    assert(nbit >= 0 && nbit < 63);
+    return bit & (1LL << nbit);
+}
+
+// bit の nbit 目を立てる
+// 0 <= nbit < 63
+inline long long bit_set(long long bit, int nbit) {
+    assert(nbit >= 0 && nbit < 63);
+    return bit | (1LL << nbit);
+}
+
+// bit の nbit 目を 0 にする
+// 0 <= nbit < 63
+inline long long bit_reset(long long bit, int nbit) {
+    assert(nbit >= 0 && nbit < 63);
+    return bit & ~(1LL << nbit);
+}
+
 
 #endif //ATCODERC_NUMERICS_HPP
