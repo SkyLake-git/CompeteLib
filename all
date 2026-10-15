@@ -1,6 +1,6 @@
 // -- Library for heuristic contest
-// https://github.com/SkyLake-git/CompeteLib/blob/main/all
-// repo: https://github.com/SkyLake-git/CompeteLib
+// Repository: https://github.com/SkyLake-git/CompeteLib
+// Using local program (https://github.com/SkyLake-git/Compete) to expand include files
 // compete BEGIN_NO_NEW_LINES
 #include "lib/typings"
 #include "lib/numerics"
@@ -8,6 +8,7 @@
 #include "lib/debug"
 #include "lib/utils"
 #include "lib/arrays"
+#include "lib/algorithm"
 #include "lib/vector"
 #include "lib/data_structure"
 #include "lib/compare"

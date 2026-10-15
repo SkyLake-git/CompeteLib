@@ -24,15 +24,42 @@ T factorial_mod(T a, T mod) {
     return res;
 }
 
+// nPr
 template<Arithmetic T>
-T probability(T a, T c) {
-    T res = a;
+T permutation(T n, T r) {
+    T res = n;
 
-    for (int i = 0; i < c; ++i) {
-        res *= a - i;
+    for (int i = 1; i < r; ++i) {
+        res *= n - i;
     }
 
     return res;
+}
+
+// nCr
+template<Arithmetic T>
+T combination(T n, T r) {
+    if (r < 0 || r > n) {
+        return 0;
+    }
+
+    if (r > n - r) {
+        r = n - r;
+    }
+
+    T res = 1;
+
+    for (T i = 1; i <= r; ++i) {
+        res = res * (n - i + 1) / i;
+    }
+
+    return res;
+}
+
+// n+1C2
+template<Arithmetic T>
+T partitions(T n) {
+    return n * (n + 1) / 2;
 }
 
 // 繰り返し2乗法
