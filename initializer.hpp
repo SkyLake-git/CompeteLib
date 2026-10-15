@@ -12,4 +12,9 @@ namespace initializer {
         mpf_set_default_prec(256);
         return true;
     }();
+
+    static bool _custom_cout = []() {
+        std::cout << std::fixed << std::setprecision(15) << std::boolalpha;
+        return true;
+    }();
 }
