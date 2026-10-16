@@ -1,5 +1,4 @@
-#ifndef ATCODERC_NUMERICS_HPP
-#define ATCODERC_NUMERICS_HPP
+#pragma once
 #include <cmath>
 #include "lib/typings"
 
@@ -120,6 +119,3 @@ inline long long bit_reset(long long bit, int nbit) {
     assert(nbit >= 0 && nbit < 63);
     return bit & ~(1LL << nbit);
 }
-
-
-#endif //ATCODERC_NUMERICS_HPP

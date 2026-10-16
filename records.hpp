@@ -1,5 +1,4 @@
-#ifndef ATCODERC_RECORDS_HPP
-#define ATCODERC_RECORDS_HPP
+#pragma once
 
 template<typename T1, typename T2, typename T3>
 struct triplet {
@@ -60,5 +59,3 @@ struct quadruplet {
 
     auto operator<=>(const quadruplet &) const = default;
 };
-
-#endif //ATCODERC_RECORDS_HPP

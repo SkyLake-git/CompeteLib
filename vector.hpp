@@ -1,5 +1,4 @@
-#ifndef ATCODERC_VECTOR_HPP
-#define ATCODERC_VECTOR_HPP
+#pragma once
 #include <cassert>
 #include <cmath>
 #include <ostream>
@@ -183,5 +182,3 @@ struct immutable_vec2i_hasher {
         return cast(encode(v), std::size_t);
     }
 };
-
-#endif //ATCODERC_VECTOR_HPP

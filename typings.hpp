@@ -1,5 +1,4 @@
-#ifndef ATCODERC_TYPINGS_HPP
-#define ATCODERC_TYPINGS_HPP
+#pragma once
 #include <concepts>
 #include <type_traits>
 
@@ -16,5 +15,3 @@ enum DistanceAlgo {
     Euclidean,
     Manhattan
 };
-
-#endif //ATCODERC_TYPINGS_HPP

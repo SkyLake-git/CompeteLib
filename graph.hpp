@@ -1,5 +1,4 @@
-#ifndef ATCODERC_GRAPH_HPP
-#define ATCODERC_GRAPH_HPP
+#pragma once
 #include <vector>
 #include <algorithm>
 
@@ -116,5 +115,3 @@ namespace graph::undirected {
         return detector.detect(true);
     }
 }
-
-#endif //ATCODERC_GRAPH_HPP

@@ -1,5 +1,4 @@
-#ifndef ATCODERC_DATA_STRUCTURE_HPP
-#define ATCODERC_DATA_STRUCTURE_HPP
+#pragma once
 #include <algorithm>
 #include <utility>
 #include "typings.hpp"
@@ -326,6 +325,3 @@ public:
         return res;
     }
 };
-
-
-#endif //ATCODERC_DATA_STRUCTURE_HPP

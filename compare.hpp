@@ -1,5 +1,4 @@
-#ifndef ATCODERC_COMPARE_HPP
-#define ATCODERC_COMPARE_HPP
+#pragma once
 #include <utility>
 
 namespace record_cmp {
@@ -27,5 +26,3 @@ namespace record_cmp {
         }
     };
 }
-
-#endif //ATCODERC_COMPARE_HPP

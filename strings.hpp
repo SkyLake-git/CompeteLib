@@ -1,5 +1,4 @@
-#ifndef ATCODERC_STRINGS_HPP
-#define ATCODERC_STRINGS_HPP
+#pragma once
 #include <regex>
 #include <string>
 
@@ -21,4 +20,3 @@ inline std::string base_convert(const std::string &str, const int n, const int m
 inline std::string simple_replace(const std::string &victim, const std::string &from, const std::string &to) {
     return std::regex_replace(victim, std::regex(from), to);
 }
-#endif //ATCODERC_STRINGS_HPP

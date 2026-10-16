@@ -1,3 +1,1 @@
-#ifndef ATCODERC_ARRAYS_HPP
-#define ATCODERC_ARRAYS_HPP
-#endif //ATCODERC_ARRAYS_HPP
+#pragma once

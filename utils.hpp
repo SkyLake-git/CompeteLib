@@ -1,5 +1,4 @@
-#ifndef ATCODERC_UTILS_HPP
-#define ATCODERC_UTILS_HPP
+#pragma once
 
 #include <ios>
 #include <iostream>
@@ -165,5 +164,3 @@ constexpr int E6 = 1'000'000;
 constexpr int E7 = 10'000'000;
 constexpr int E8 = 100'000'000;
 constexpr int E9 = 1'000'000'000;
-
-#endif //ATCODERC_UTILS_HPP

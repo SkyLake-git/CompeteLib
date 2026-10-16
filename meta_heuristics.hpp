@@ -1,5 +1,4 @@
-#ifndef ATCODERC_META_HEURISTICS_HPP
-#define ATCODERC_META_HEURISTICS_HPP
+#pragma once
 #include <algorithm>
 #include <unordered_set>
 
@@ -219,5 +218,3 @@ public:
         return {beam.front(), advanced};
     }
 };
-
-#endif //ATCODERC_META_HEURISTICS_HPP

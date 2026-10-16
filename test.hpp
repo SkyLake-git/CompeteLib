@@ -1,5 +1,4 @@
-#ifndef ATCODERC_TEST_H
-#define ATCODERC_TEST_H
+#pragma once
 #include <set>
 using namespace std;
 
@@ -10,4 +9,3 @@ inline void func_test() {
     s.insert(1);
     cout << s.size() << endl;
 }
-#endif //ATCODERC_TEST_H

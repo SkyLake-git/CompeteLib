@@ -1,5 +1,4 @@
-#ifndef ATCODERC_SEARCH_HPP
-#define ATCODERC_SEARCH_HPP
+#pragma once
 #include <queue>
 #include <stack>
 
@@ -7,6 +6,3 @@
 
 namespace search {
 }
-
-
-#endif //ATCODERC_SEARCH_HPP

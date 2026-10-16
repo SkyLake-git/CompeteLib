@@ -1,5 +1,4 @@
-#ifndef ATCODERC_ALGORITHM_HPP
-#define ATCODERC_ALGORITHM_HPP
+#pragma once
 
 #include <algorithm>
 #include <cstddef>
@@ -31,5 +30,3 @@ void gp_slide(T n, Validator is_ok, Applier apply) {
         apply(left, right);
     }
 }
-
-#endif //ATCODERC_ALGORITHM_HPP

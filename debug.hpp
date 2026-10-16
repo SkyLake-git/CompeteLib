@@ -1,5 +1,4 @@
-#ifndef ATCODERC_DEBUG_HPP
-#define ATCODERC_DEBUG_HPP
+#pragma once
 #include <iostream>
 
 #ifndef ONLINE_JUDGE
@@ -25,5 +24,3 @@ constexpr bool IS_ONLINE_JUDGE = true;
 #else
 constexpr bool IS_ONLINE_JUDGE = false;
 #endif
-
-#endif //ATCODERC_DEBUG_HPP
