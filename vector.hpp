@@ -182,3 +182,7 @@ struct immutable_vec2i_hasher {
         return cast(encode(v), std::size_t);
     }
 };
+
+const vec2i dv[4] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+// y+down, x+right, y-up, x-left
+const std::pair<vec2i, char> dvw[4] = {{{0, 1}, 'D'}, {{1, 0}, 'R'}, {{0, -1}, 'U'}, {{-1, 0}, 'L'}};

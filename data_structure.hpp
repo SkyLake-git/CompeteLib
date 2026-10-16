@@ -325,3 +325,51 @@ public:
         return res;
     }
 };
+
+/**
+ * Union-Find
+ *
+ * https://github.com/ei1333/library/blob/master/structure/union-find/union-find.hpp
+ * Licensed under the Unlicense, Modified from the original
+ */
+struct union_find {
+    std::vector<int> data;
+
+    union_find() = default;
+
+    explicit union_find(std::size_t sz) : data(sz, -1) {
+    }
+
+    // x と y を unite する
+    bool unite(int x, int y) {
+        x = find(x), y = find(y);
+        if (x == y) return false;
+        if (data[x] > data[y]) std::swap(x, y);
+        data[x] += data[y];
+        data[y] = x;
+        return true;
+    }
+
+    // k の属する集合の代表元
+    int find(int k) {
+        if (data[k] < 0) return (k);
+        return data[k] = find(data[k]);
+    }
+
+    // k の属する集合の要素数
+    int size(int k) { return -data[find(k)]; }
+
+    // x と y が同じ集合に属しているか
+    bool same(int x, int y) { return find(x) == find(y); }
+
+    // 全ての集合に含まれる要素を列挙 (要素は昇順、集合の順番は未定義)
+    std::vector<std::vector<int>> groups() {
+        int n = static_cast<int>(data.size());
+        std::vector<std::vector<int>> ret(n);
+        for (int i = 0; i < n; i++) {
+            ret[find(i)].emplace_back(i);
+        }
+        std::erase_if(ret, [&](const std::vector<int> &v) { return v.empty(); });
+        return ret;
+    }
+};
