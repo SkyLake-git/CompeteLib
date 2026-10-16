@@ -10,9 +10,13 @@
 #define Yes cout << "Yes\n"
 #define zerofill(obj) memset(obj, 0, sizeof(obj))
 #define nonefill(obj) memset(obj, -1, sizeof(obj))
+#define inffill(obj) memset(obj, 0x3f, sizeof(obj))
 #define cast(obj, t) static_cast<t>(obj)
 #define cint(obj) static_cast<int>(obj)
 #define cll(obj) static_cast<ll>(obj)
+
+constexpr int INF_INT = 0x3f3f3f3f;
+constexpr long long INF_LL = 0x3f3f3f3f3f3f3f3f;
 
 static std::mt19937_64 rnd_mt64(100);
 
