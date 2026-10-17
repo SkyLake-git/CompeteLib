@@ -13,6 +13,7 @@ struct abstract_sequential_state {
     virtual bool next(const Operation &) = 0;
     virtual std::generator<Operation> expand() const = 0;
     virtual long long calculate_next_score(const Operation &) const = 0;
+    // 解が完成しているか
     virtual bool is_terminal() const { return false; }
     virtual std::optional<unsigned long long> next_hash(const Operation &) const { return std::nullopt; }
 };
