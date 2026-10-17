@@ -5,6 +5,10 @@
 #include "typings.hpp"
 
 namespace graph {
+    /**
+     * @tparam T 辺の値型。デフォルトコンストラクタを利用するため、
+     *            -1 から暗黙変換可能な型である必要があります。
+     */
     template<class T>
     struct edge {
         int from, to;
@@ -85,6 +89,10 @@ namespace graph {
 
 // https://drken1215.hatenablog.com/entry/2023/05/20/200517
 namespace graph::functional {
+    /**
+     * @param graph 各頂点からちょうど1つの頂点へ向かう functional graph。
+     *              空のグラフ、および各要素が有効な頂点番号を指さない入力は未定義です。
+     */
     inline std::vector<int> detect_cycle(const std::vector<int> &graph) {
         int v = 0;
         for (int i = 0; i < static_cast<int>(graph.size()); ++i) v = graph[v];
@@ -109,6 +117,8 @@ namespace graph::directed {
 namespace graph::undirected {
     /**
      * atcoder/dsu を利用することも検討してください
+     *
+     * 親頂点への辺は頂点番号だけで除外するため、多重辺を含むグラフには対応していません。
      */
     inline std::vector<edge<int>> detect_cycle(std::vector<std::vector<edge<int>>> &graph) {
         cycle_detector detector(graph);

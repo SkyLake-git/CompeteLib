@@ -1,10 +1,6 @@
 #pragma once
 
-#include <ios>
-#include <iostream>
-#include <random>
-#include <cstdlib>
-#include <generator>
+#include <bits/stdc++.h>
 
 #define No cout << "No\n"
 #define Yes cout << "Yes\n"
