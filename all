@@ -1,3 +1,4 @@
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 // -- Library for heuristic contest
 // Repository: https://github.com/SkyLake-git/CompeteLib
 // Using local program (https://github.com/SkyLake-git/Compete) to expand include files
