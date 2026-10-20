@@ -61,6 +61,11 @@ T partitions(T n) {
     return n * (n + 1) / 2;
 }
 
+template<Arithmetic T>
+T sum_seq(T a, T l, T n) {
+    return (a + l) * n / 2;
+}
+
 // 繰り返し2乗法
 template<Arithmetic R, Arithmetic T>
 R pow_int(T a, T exponent) {
