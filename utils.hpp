@@ -71,6 +71,24 @@ inline long double randf() {
                long>::max();
 }
 
+template<typename T>
+bool chmax(T &a, const T &b) {
+    if (a < b) {
+        a = b;
+        return true;
+    }
+    return false;
+}
+
+template<typename T>
+bool chmin(T &a, const T &b) {
+    if (a > b) {
+        a = b;
+        return true;
+    }
+    return false;
+}
+
 inline std::generator<int> range_bfs(int min, int max, int start) {
     co_yield start;
     for (int d = 1; d <= max - min; ++d) {
