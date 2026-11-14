@@ -1,7 +1,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 // -- Library for normal contest
 // Repository: https://github.com/SkyLake-git/CompeteLib
-// Using local program (https://github.com/SkyLake-git/Compete) to expand include files
+// Using local program (https://github.com/SkyLake-git/cp-tools) to expand include files
 // compete BEGIN_NO_NEW_LINES
 #include "lib/typings"
 #include "lib/numerics"
