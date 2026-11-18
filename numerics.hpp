@@ -67,9 +67,9 @@ T sum_seq(T a, T l, T n) {
 }
 
 // 繰り返し2乗法
-template<Arithmetic R, Arithmetic T>
-R pow_int(T a, T exponent) {
-    R x = 1;
+template<Arithmetic T>
+T pow_int(T a, T exponent) {
+    T x = 1;
     while (exponent > 0) {
         if (exponent % 2 == 1) {
             x *= a;
