@@ -16,9 +16,7 @@ struct vec2 {
 
     vec2() = default;
 
-    vec2(T x, T y) {
-        this->x = x;
-        this->y = y;
+    vec2(T p_x, T p_y) : x(p_x), y(p_y) {
     }
 
     explicit vec2(std::pair<T, T> &a) {
@@ -124,24 +122,24 @@ struct vec2i_hasher {
     vec2i_hasher(int x, int y) : size_x(x), size_y(y) {
     }
 
-    void change(int size_x, int size_y) {
-        this->size_x = size_x;
-        this->size_y = size_y;
+    void change(int p_size_x, int p_size_y) {
+        this->size_x = p_size_x;
+        this->size_y = p_size_y;
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    long long encode_from(int x, int y) const {
+    [[nodiscard]] long long encode_from(int x, int y) const {
         assert(0 <= x && x < size_x);
         assert(0 <= y && y < size_y);
         return static_cast<long long>(x) * size_y + y;
     }
 
-    long long encode(const vec2<int> &v) const {
+    [[nodiscard]] long long encode(const vec2<int> &v) const {
         return encode_from(v.x, v.y);
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    vec2<int> decode(long long value) const {
+    [[nodiscard]] vec2<int> decode(long long value) const {
         assert(0 <= value && value < static_cast<long long>(size_x) * size_y);
 
         return {
@@ -158,18 +156,18 @@ struct vec2i_hasher {
 template<int X, int Y>
 struct immutable_vec2i_hasher {
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    long long encode_from(int x, int y) const {
+    [[nodiscard]] long long encode_from(int x, int y) const {
         assert(0 <= x && x < X);
         assert(0 <= y && y < Y);
         return static_cast<long long>(x) * Y + y;
     }
 
-    long long encode(const vec2<int> &v) const {
+    [[nodiscard]] long long encode(const vec2<int> &v) const {
         return encode_from(v.x, v.y);
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    vec2<int> decode(long long value) const {
+    [[nodiscard]] vec2<int> decode(long long value) const {
         assert(0 <= value && value < static_cast<long long>(X) * Y);
 
         return {
