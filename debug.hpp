@@ -12,6 +12,13 @@
 #include <variant>
 #include <vector>
 
+#ifdef ONLINE_JUDGE
+namespace debug_detail {
+    template<typename... T>
+    void print(const char *names, const char *file, int line, const T &... value) {
+    }
+}
+#else
 namespace debug_detail {
     template<typename T>
     using plain_t = std::remove_cv_t<std::remove_reference_t<T>>;
@@ -49,10 +56,10 @@ namespace debug_detail {
         std::vector<std::string> result;
         result.reserve(sizeof...(value));
         (result.push_back([&] {
-             std::ostringstream out;
-             write(out, value, indent);
-             return out.str();
-         }()), ...);
+            std::ostringstream out;
+            write(out, value, indent);
+            return out.str();
+        }()), ...);
         return result;
     }
 
@@ -89,7 +96,7 @@ namespace debug_detail {
             out << value;
         } else if constexpr (requires { value.first; value.second; value.third; value.fourth; }) {
             out << '(' << join(", ", write_all(indent, value.first, value.second, value.third, value.fourth))
-                << ')';
+                    << ')';
         } else if constexpr (requires { value.first; value.second; value.third; }) {
             out << '(' << join(", ", write_all(indent, value.first, value.second, value.third)) << ')';
         } else if constexpr (requires { value.first; value.second; }) {
@@ -132,30 +139,15 @@ namespace debug_detail {
 
     template<typename... T>
     void print(const char *names, const char *file, int line, const T &... value) {
-#ifndef ONLINE_JUDGE
         std::cerr << file << ':' << line << ": " << names << " = "
-                  << join(", ", write_all(0, value...)) << '\n';
-#else
-        (void) names;
-        (void) file;
-        (void) line;
-        (void) sizeof...(value);
-#endif
+                << join(", ", write_all(0, value...)) << '\n';
     }
-} // namespace debug_detail
-
-#define dbg(...) \
-    (::debug_detail::print(#__VA_ARGS__, __FILE__, __LINE__, __VA_ARGS__), (__VA_ARGS__))
-
-template<typename... T>
-void NOP_LOCAL_DEBUG(const T &...) {
 }
-
-#ifdef ONLINE_JUDGE
-#define printf(...) NOP_LOCAL_DEBUG(__VA_ARGS__)
-#else
-#define printf(...) std::fprintf(stderr, __VA_ARGS__)
 #endif
+#define dbg(...) \
+    if constexpr(!IS_ONLINE_JUDGE) (::debug_detail::print(#__VA_ARGS__, __FILE__, __LINE__, __VA_ARGS__), (__VA_ARGS__))
+
+#define printf(...) if constexpr(!IS_ONLINE_JUDGE) std::fprintf(stderr, __VA_ARGS__)
 
 #ifdef ONLINE_JUDGE
 constexpr bool IS_ONLINE_JUDGE = true;
