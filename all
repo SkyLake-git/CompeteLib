@@ -19,3 +19,13 @@
 
 #include "lib/initializer"
 #include "lib/usings"
+
+#ifndef ONLINE_JUDGE
+std::ofstream &getLocalOut() {
+    static std::ofstream of("./out.txt");
+
+    return of;
+}
+
+#define cout getLocalOut()
+#endif
