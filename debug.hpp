@@ -10,12 +10,23 @@
 #include <type_traits>
 #include <utility>
 #include <variant>
+#include <ranges>
 #include <vector>
 
 #ifdef ONLINE_JUDGE
 namespace debug_detail {
     template<typename... T>
     void print(const char *names, const char *file, int line, const T &... value) {
+    }
+
+    template<typename T>
+    void print_array(
+        const char *names,
+        const char *file,
+        int line,
+        const T *value,
+        std::size_t size
+    ) {
     }
 }
 #else
@@ -27,11 +38,7 @@ namespace debug_detail {
     concept String = std::is_convertible_v<T, std::string_view>;
 
     template<typename T>
-    concept Range = requires(const T &value)
-    {
-        std::begin(value);
-        std::end(value);
-    } && !String<T>;
+    concept Range = std::ranges::range<const T> && !String<T>;
 
     template<typename T>
     concept Tuple = requires
@@ -142,10 +149,24 @@ namespace debug_detail {
         std::cerr << file << ':' << line << ": " << names << " = "
                 << join(", ", write_all(0, value...)) << '\n';
     }
+
+    template<typename T>
+    void print_array(
+        const char *names,
+        const char *file,
+        int line,
+        const T *value,
+        std::size_t size
+    ) {
+        std::cerr << file << ':' << line << ": " << names << " = ";
+        write(std::cerr, std::span(value, size));
+        std::cerr << '\n';
+    }
 }
 #endif
 #define dbg(...) \
     if constexpr(!IS_ONLINE_JUDGE) (::debug_detail::print(#__VA_ARGS__, __FILE__, __LINE__, __VA_ARGS__), (__VA_ARGS__))
+#define dbgarr(array, size) if constexpr (!IS_ONLINE_JUDGE) (::debug_detail::print_array(#array, __FILE__, __LINE__, array, size), (array))
 
 #define printf(...) if constexpr(!IS_ONLINE_JUDGE) std::fprintf(stderr, __VA_ARGS__)
 
