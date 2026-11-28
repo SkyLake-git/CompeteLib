@@ -117,15 +117,9 @@ inline std::string join(const std::string &delimiter, const std::vector<std::str
     return res + target.back();
 }
 
-template<typename T>
-std::ostream &operator<<(std::ostream &os, std::vector<T> arr) {
-    std::string s = "[ ";
-    for (int i = 0; i < static_cast<int>(arr.size()); ++i) {
-        s.append(std::to_string(arr[i]) + ", ");
-    }
-
-    os << s << "]";
-    return os;
+// [l1, r1], [l2, r2]
+inline bool intersects_range(int l1, int r1, int l2, int r2) {
+    return std::max(l1, l2) <= std::min(r1, r2);
 }
 
 // bypass clangd lifehack
@@ -182,3 +176,4 @@ constexpr int E6 = 1'000'000;
 constexpr int E7 = 10'000'000;
 constexpr int E8 = 100'000'000;
 constexpr int E9 = 1'000'000'000;
+constexpr long long E18 = 1'000'000'000'000'000'000;
